@@ -6,55 +6,10 @@
 
 from pyspark import SparkContext, SparkConf
 from pyspark.conf import SparkConf
-
-conf = SparkConf()
-conf.setMaster("local").setAppName("flask_app")
-sc = SparkContext.getOrCreate(conf=conf)
-
 from pyspark import SQLContext
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import StringType, ArrayType
-
-sqlContext = SQLContext(sc)
-spark = SparkSession.builder.getOrCreate()
-
-
-# In[2]:
-
-
-spark = SparkSession.builder.getOrCreate()
-
-
-# In[3]:
-
-
-import psycopg2
-from sqlalchemy import create_engine
-import pandas as pd
-
-engine = create_engine("postgresql+psycopg2://root:root@localhost/test_db?client_encoding=utf8")
-pd_actor = pd.read_sql('select * from public.actor', engine)
-pd_address = pd.read_sql('select * from public.address', engine)
-pd_category = pd.read_sql('select * from public.category', engine)
-pd_city = pd.read_sql('select * from public.city', engine)
-pd_country = pd.read_sql('select * from public.country', engine)
-pd_custormer = pd.read_sql('select * from public.customer', engine)
-pd_film = pd.read_sql('select * from public.film', engine)
-pd_film_actor = pd.read_sql('select * from public.film_actor', engine)
-pd_film_category = pd.read_sql('select * from public.film_category', engine)
-pd_invenotory = pd.read_sql('select * from public.inventory', engine)
-pd_language = pd.read_sql('select * from public.language', engine)
-pd_payment = pd.read_sql('select * from public.payment', engine)
-pd_rental = pd.read_sql('select * from public.rental', engine)
-pd_staff = pd.read_sql('select * from public.staff', engine)
-pd_store = pd.read_sql('select * from public.store', engine)
-
-
-# In[4]:
-
-
-pd_staff.drop(columns=['picture'])
 
 
 # In[5]:
@@ -62,53 +17,146 @@ pd_staff.drop(columns=['picture'])
 
 from pyspark.sql.types import *
 
-df_actor = spark.createDataFrame(pd_actor)
-df_address = spark.createDataFrame(pd_address)
-df_category = spark.createDataFrame(pd_category)
-df_city = spark.createDataFrame(pd_city)
-df_country = spark.createDataFrame(pd_country)
-df_customer = spark.createDataFrame(pd_custormer)
+spark = SparkSession \
+    .builder \
+    .appName("Python Spark SQL basic example") \
+    .config("spark.jars", "postgresql-42.4.0.jar")\
+    .getOrCreate()
 
-film_schemas = StructType([
-    StructField('film_id', IntegerType(), True),
-    StructField('title', StringType(), True),
-    StructField('description', StringType(), True),
-    StructField('release_year', IntegerType(), True),
-    StructField('language_id', IntegerType(), True),
-    StructField('original_language_id', IntegerType(), True),
-    StructField('rental_duration', IntegerType(), True),
-    StructField('rental_rate', DoubleType(), True),
-    StructField('length', IntegerType(), True),
-    StructField('replacement_cost', DoubleType(), True),
-    StructField('rating', StringType(), True),
-    StructField('last_update', TimestampType(), True),
-    StructField('special_features', StringType(), True),
-    StructField('fulltext', StringType(), True),
-])
+df_actor = spark.read \
+    .format("jdbc") \
+    .option("url", "jdbc:postgresql://localhost:5432/test_db") \
+    .option("dbtable", "public.actor") \
+    .option("user", "root") \
+    .option("password", "root") \
+    .option("driver", "org.postgresql.Driver") \
+    .load()
 
-df_film = spark.createDataFrame(pd_film, schema=film_schemas)
-df_film_actor = spark.createDataFrame(pd_film_actor)
-df_film_category = spark.createDataFrame(pd_film_category)
-df_invenotry = spark.createDataFrame(pd_invenotory)
-df_language = spark.createDataFrame(pd_language)
-df_payment = spark.createDataFrame(pd_payment)
-df_rental = spark.createDataFrame(pd_rental)
+df_address = spark.read \
+    .format("jdbc") \
+    .option("url", "jdbc:postgresql://localhost:5432/test_db") \
+    .option("dbtable", "public.address") \
+    .option("user", "root") \
+    .option("password", "root") \
+    .option("driver", "org.postgresql.Driver") \
+    .load()
 
-staff_schemas = StructType([
-    StructField('staff_id', IntegerType(), True),
-    StructField('first_name', StringType(), True),
-    StructField('last_name', StringType(), True),
-    StructField('address_id', IntegerType(), True),
-    StructField('email', StringType(), True),
-    StructField('store_id', IntegerType(), True),
-    StructField('active', IntegerType(), True),
-    StructField('username', StringType(), True),
-    StructField('password', StringType(), True),
-    StructField('last_update', TimestampType(), True),
-])
+df_category = spark.read \
+    .format("jdbc") \
+    .option("url", "jdbc:postgresql://localhost:5432/test_db") \
+    .option("dbtable", "public.category") \
+    .option("user", "root") \
+    .option("password", "root") \
+    .option("driver", "org.postgresql.Driver") \
+    .load()
 
-df_staff = spark.createDataFrame(pd_staff.drop(columns=['picture']))
-df_store = spark.createDataFrame(pd_store)
+df_city = spark.read \
+    .format("jdbc") \
+    .option("url", "jdbc:postgresql://localhost:5432/test_db") \
+    .option("dbtable", "public.city") \
+    .option("user", "root") \
+    .option("password", "root") \
+    .option("driver", "org.postgresql.Driver") \
+    .load()
+
+df_country = spark.read \
+    .format("jdbc") \
+    .option("url", "jdbc:postgresql://localhost:5432/test_db") \
+    .option("dbtable", "public.country") \
+    .option("user", "root") \
+    .option("password", "root") \
+    .option("driver", "org.postgresql.Driver") \
+    .load()
+
+df_customer = spark.read \
+    .format("jdbc") \
+    .option("url", "jdbc:postgresql://localhost:5432/test_db") \
+    .option("dbtable", "public.customer") \
+    .option("user", "root") \
+    .option("password", "root") \
+    .option("driver", "org.postgresql.Driver") \
+    .load()
+
+df_film = spark.read \
+    .format("jdbc") \
+    .option("url", "jdbc:postgresql://localhost:5432/test_db") \
+    .option("dbtable", "public.film") \
+    .option("user", "root") \
+    .option("password", "root") \
+    .option("driver", "org.postgresql.Driver") \
+    .load()
+
+df_film_actor = spark.read \
+    .format("jdbc") \
+    .option("url", "jdbc:postgresql://localhost:5432/test_db") \
+    .option("dbtable", "public.film_actor") \
+    .option("user", "root") \
+    .option("password", "root") \
+    .option("driver", "org.postgresql.Driver") \
+    .load()
+
+df_film_category = spark.read \
+    .format("jdbc") \
+    .option("url", "jdbc:postgresql://localhost:5432/test_db") \
+    .option("dbtable", "public.film_category") \
+    .option("user", "root") \
+    .option("password", "root") \
+    .option("driver", "org.postgresql.Driver") \
+    .load()
+
+df_invenotry = spark.read \
+    .format("jdbc") \
+    .option("url", "jdbc:postgresql://localhost:5432/test_db") \
+    .option("dbtable", "public.inventory") \
+    .option("user", "root") \
+    .option("password", "root") \
+    .option("driver", "org.postgresql.Driver") \
+    .load()
+
+df_language = spark.read \
+    .format("jdbc") \
+    .option("url", "jdbc:postgresql://localhost:5432/test_db") \
+    .option("dbtable", "public.language") \
+    .option("user", "root") \
+    .option("password", "root") \
+    .option("driver", "org.postgresql.Driver") \
+    .load()
+
+df_payment = spark.read \
+    .format("jdbc") \
+    .option("url", "jdbc:postgresql://localhost:5432/test_db") \
+    .option("dbtable", "public.payment") \
+    .option("user", "root") \
+    .option("password", "root") \
+    .option("driver", "org.postgresql.Driver") \
+    .load()
+
+df_rental = spark.read \
+    .format("jdbc") \
+    .option("url", "jdbc:postgresql://localhost:5432/test_db") \
+    .option("dbtable", "public.rental") \
+    .option("user", "root") \
+    .option("password", "root") \
+    .option("driver", "org.postgresql.Driver") \
+    .load()
+
+df_staff = spark.read \
+    .format("jdbc") \
+    .option("url", "jdbc:postgresql://localhost:5432/test_db") \
+    .option("dbtable", "public.staff") \
+    .option("user", "root") \
+    .option("password", "root") \
+    .option("driver", "org.postgresql.Driver") \
+    .load()
+
+df_store = spark.read \
+    .format("jdbc") \
+    .option("url", "jdbc:postgresql://localhost:5432/test_db") \
+    .option("dbtable", "public.store") \
+    .option("user", "root") \
+    .option("password", "root") \
+    .option("driver", "org.postgresql.Driver") \
+    .load()
 
 
 # # Task 1
